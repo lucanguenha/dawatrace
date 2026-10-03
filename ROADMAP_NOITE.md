@@ -16,35 +16,42 @@ sem alternativa.
 - [x] Pedido disparado ao Claude Code via pedir_ao_claude_code.py (06:02 Macau)
 - [x] Confirmado a trabalhar (explorou estrutura, a planear) — 06:03 Macau
 
-## CHECKPOINT 1 — Caminho feliz ponta-a-ponta (06:15-10:00, ~4h) 🔵 EM CURSO
+## CHECKPOINT 1 — Caminho feliz ponta-a-ponta (06:15-10:00, ~4h) ✅ FEITO (pelo Claude Code, por confirmar pela Luna)
 Objectivo: ver REC + DESP a gerar um ALERT no painel, nem que seja feio.
-- [ ] Simulador de SMS (2 caixas de texto: Clinic / Warehouse)
-- [ ] Motor de reconciliacao (cruza REC vs DESP, calcula desvio)
-- [ ] Painel mostra o alerta gerado
-- [ ] CHECK ~07:30: correr `git log --oneline` e `ls backend/ web/` — ver progresso real
-- [ ] CHECK ~09:00: tentar correr a app localmente e ver se sobe sem erro
-- [ ] CHECK ~10:00: fechar o checkpoint, avaliar atraso vs plano
+- [x] Simulador de SMS (2 caixas de texto: Clinic / Warehouse)
+- [x] Motor de reconciliacao (cruza REC vs DESP, calcula desvio) — backend/reconcile.py
+- [x] Painel mostra o alerta gerado — testado com o exemplo exacto do brief (REC 500 /
+      DESP 800 AMOX 250 em Clinic #14 -> gap 300)
+- [x] CHECK: `git log --oneline` tem 4 commits pequenos; `ls backend/ web/` confere
+- [x] CHECK: app corre com `./run.sh` numa pasta limpa (sem .venv nem data/dawatrace.db)
 
-## CHECKPOINT 2 — Inteligencia (10:00-13:00, ~3h)
+## CHECKPOINT 2 — Inteligencia (10:00-13:00, ~3h) ✅ FEITO
 Objectivo: o agente explica a anomalia, cita evidencia, decide escalar ou nao.
-- [ ] Integracao Claude (haiku/sonnet) para explicar o alerta em linguagem simples
-- [ ] Confidence score (calculado deterministicamente, nao pelo LLM)
-- [ ] Escalonamento humano quando confidence baixo
-- [ ] CHECK: testar com 2-3 cenarios (desvio real, desvio pequeno/ambiguo, sem desvio)
+- [x] Integracao Claude (claude-haiku-4-5, tool-use real) — backend/claude_agent.py
+- [x] Confidence score (calculado deterministicamente, nao pelo LLM) — backend/reconcile.py
+- [x] Escalonamento humano quando confidence baixo (ESCALATION_CEILING=55)
+- [x] CHECK: testado com 3 cenarios (C02/PARA gap grande corroborado -> escalated a 46%;
+      C04/ACT gap pequeno isolado -> escalated a 11.5%; C05/ORS sem gap -> ok, sem alerta)
+- NOTA: ver PERGUNTAS.md #1 — o cenario scripted principal tambem sai "escalated" (23%),
+  nao "flagged" directo. Decisao de produto, nao bloqueio — continuei com o comportamento
+  actual.
 
-## CHECKPOINT 3 — Polimento + dados (13:00-15:30, ~2h30)
-- [ ] Dados sinteticos realistas (5 clinicas, 3-4 medicamentos tipo Amox/Paracetamol/ACT)
-- [ ] Trilha de auditoria completa visivel no painel (quem, quando, evidencia)
-- [ ] UI decente (tailwind CDN, nao precisa ser perfeita)
-- [ ] Integracao ElevenLabs (voz) SE houver tempo — e nice-to-have, nao bloqueia o resto
-- [ ] CHECK: screenshot do painel, ver se "bate" com o cartaz ja feito
+## CHECKPOINT 3 — Polimento + dados (13:00-15:30, ~2h30) 🟡 PARCIAL
+- [x] Dados sinteticos (5 clinicas, 4 medicamentos: Amox, Paracetamol, ACT, ORS)
+- [x] Trilha de auditoria completa visivel no painel (quem, quando, evidencia, canal)
+- [x] UI decente (tailwind CDN)
+- [x] Canal duplo SMS/WhatsApp (pedido extra via ADICAO_whatsapp.md) — mesmo formato,
+      mesmo motor, so a UI distingue
+- [ ] ElevenLabs (voz) — NAO FEITO, fica para se houver tempo (nice-to-have, como previsto)
 
-## CHECKPOINT 4 — Publicacao tecnica (15:30-17:00, ~1h30)
-- [ ] README.md em ingles, claro, com o problema + como correr
-- [ ] App preparada para correr com 1 comando
-- [ ] Live demo link — expor a app publicamente (tunnel ou porto do servidor)
-- [ ] ACORDAR O LUCAS SE: precisar de criar o repo GitHub (preciso do token dele) — isto e
-      bloqueio real, nao decisao estetica. Senao deixo para quando ele acordar organicamente.
+## CHECKPOINT 4 — Publicacao tecnica (15:30-17:00, ~1h30) ✅ FEITO (a parte minha)
+- [x] README.md em ingles, com o problema, a arquitectura, como correr, e o passo-a-passo
+      do exemplo do brief
+- [x] App preparada para correr com 1 comando (`./run.sh`, testado do zero)
+- [ ] Live demo link — NAO fiz, como o pedido original instruiu explicitamente ("nao te
+      preocupes com isso agora"). Fica para quando decidirem o tunnel/porto publico.
+- [ ] GitHub: NAO criei repo nem fiz push, como instruido. Trabalho todo em commits locais
+      (4 commits em /root/projects/dawatrace, `git log --oneline` para ver).
 
 ## CHECKPOINT 5 — Videos + submissao (17:00-20:00, ~3h) — REQUER O LUCAS
 Isto NAO posso fazer sozinha: precisa da cara/voz dele nos videos (team intro, pitch) e da
