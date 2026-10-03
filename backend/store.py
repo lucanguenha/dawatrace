@@ -56,7 +56,14 @@ def init_db():
                 clinic_id TEXT NOT NULL REFERENCES clinics(id),
                 drug_code TEXT NOT NULL REFERENCES drugs(code),
                 qty INTEGER NOT NULL,
-                raw_text TEXT NOT NULL
+                raw_text TEXT NOT NULL,
+                -- Which channel this reached us on. Same command format, same
+                -- reconciliation engine either way - this column only exists
+                -- so the audit trail can show the capability/access trade-off
+                -- (SMS needs no data/smartphone; WhatsApp is the upgrade path
+                -- for whoever already has both). Added 04/Oct/2026 per Lucas's
+                -- note, see ADICAO_whatsapp.md.
+                channel TEXT NOT NULL DEFAULT 'sms' CHECK (channel IN ('sms', 'whatsapp'))
             );
 
             -- One row per (clinic, drug) reconciliation outcome. Recomputed
@@ -92,12 +99,12 @@ def seed_if_empty(clinics, drugs):
         return True
 
 
-def insert_event(kind, clinic_id, drug_code, qty, raw_text):
+def insert_event(kind, clinic_id, drug_code, qty, raw_text, channel="sms"):
     with connect() as conn:
         cur = conn.execute(
-            "INSERT INTO events (ts, kind, clinic_id, drug_code, qty, raw_text) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (_now(), kind, clinic_id, drug_code, qty, raw_text),
+            "INSERT INTO events (ts, kind, clinic_id, drug_code, qty, raw_text, channel) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (_now(), kind, clinic_id, drug_code, qty, raw_text, channel),
         )
         return cur.lastrowid
 

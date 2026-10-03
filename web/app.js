@@ -1,4 +1,19 @@
 const API = "";
+let currentChannel = "sms";
+
+function setChannel(channel) {
+  currentChannel = channel;
+  const isSms = channel === "sms";
+  document.getElementById("smsMode").classList.toggle("hidden", !isSms);
+  document.getElementById("waMode").classList.toggle("hidden", isSms);
+  document.getElementById("chanSmsBtn").className =
+    "px-3 py-1.5 font-medium " + (isSms ? "bg-slate-700 text-white" : "bg-slate-900 text-slate-400");
+  document.getElementById("chanWaBtn").className =
+    "px-3 py-1.5 font-medium " + (!isSms ? "bg-slate-700 text-white" : "bg-slate-900 text-slate-400");
+  document.getElementById("channelNote").textContent = isSms
+    ? "Works on any phone with signal, zero mobile data required — the lowest common denominator for rural clinics."
+    : "Upgrade path for staff who already have a smartphone and mobile data — same format, same engine underneath.";
+}
 
 async function loadClinics() {
   const res = await fetch(`${API}/api/clinics`);
@@ -68,7 +83,8 @@ async function loadEvents() {
   const el = document.getElementById("eventsList");
   el.innerHTML = events.slice(0, 30).map(e => {
     const color = e.kind === "REC" ? "text-emerald-400" : "text-sky-400";
-    return `<div class="${color}">[${e.ts.slice(0,16).replace('T',' ')}] ${e.kind} ${e.qty} ${e.drug_code} ${e.drug_dosage} — ${e.clinic_name}</div>`;
+    const chanIcon = e.channel === "whatsapp" ? "💬" : "📟";
+    return `<div class="${color}">[${e.ts.slice(0,16).replace('T',' ')}] ${chanIcon} ${e.kind} ${e.qty} ${e.drug_code} ${e.drug_dosage} — ${e.clinic_name}</div>`;
   }).join("");
 }
 
@@ -76,17 +92,25 @@ async function refreshAll() {
   await Promise.all([loadAlerts(), loadEvents()]);
 }
 
+function _readInput(sender) {
+  if (currentChannel === "whatsapp") {
+    const el = document.getElementById(sender === "clinic" ? "clinicTextWa" : "warehouseTextWa");
+    return (el.innerText || el.textContent || "").trim();
+  }
+  const el = document.getElementById(sender === "clinic" ? "clinicText" : "warehouseText");
+  return el.value.trim();
+}
+
 async function sendSms(sender) {
   const clinicId = document.getElementById("clinicSelect").value;
-  const inputId = sender === "clinic" ? "clinicText" : "warehouseText";
-  const text = document.getElementById(inputId).value.trim();
+  const text = _readInput(sender);
   const resultEl = document.getElementById("smsResult");
   resultEl.innerHTML = `<span class="text-slate-500">Sending…</span>`;
   try {
     const res = await fetch(`${API}/api/sms`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sender, clinic_id: clinicId, text }),
+      body: JSON.stringify({ sender, clinic_id: clinicId, text, channel: currentChannel }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -104,5 +128,6 @@ async function sendSms(sender) {
   }
 }
 
+setChannel("sms");
 loadClinics().then(refreshAll);
 setInterval(refreshAll, 8000);

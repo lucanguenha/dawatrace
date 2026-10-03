@@ -39,6 +39,7 @@ class SmsIn(BaseModel):
     sender: str  # "clinic" | "warehouse" - who the simulator box represents
     clinic_id: str
     text: str
+    channel: str = "sms"  # "sms" | "whatsapp" - same command format, same engine
 
 
 def _label(drug_row):
@@ -49,7 +50,8 @@ def _evidence_lines(events):
     out = []
     for e in events:
         who = "Clinic" if e["kind"] == "REC" else "Warehouse"
-        out.append(f"[{e['ts'][:16].replace('T', ' ')}] {e['raw_text']}  ({who})")
+        canal = e.get("channel", "sms").upper()
+        out.append(f"[{e['ts'][:16].replace('T', ' ')}] {e['raw_text']}  ({who} via {canal})")
     return out
 
 
@@ -78,7 +80,9 @@ def receive_sms(payload: SmsIn):
     if payload.clinic_id not in clinics:
         raise HTTPException(status_code=400, detail=f"Clínica desconhecida: {payload.clinic_id}")
 
-    event_id = store.insert_event(kind, payload.clinic_id, drug_code, qty, payload.text.strip())
+    channel = payload.channel if payload.channel in ("sms", "whatsapp") else "sms"
+    event_id = store.insert_event(kind, payload.clinic_id, drug_code, qty,
+                                   payload.text.strip(), channel)
 
     alert = _reconcile_and_maybe_alert(payload.clinic_id, drug_code)
     return {"event_id": event_id, "parsed": {"kind": kind, "qty": qty, "drug": drug_code, "dosage": dosage},

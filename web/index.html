@@ -38,10 +38,28 @@
         <code class="mono bg-slate-800 px-1 rounded">DESP &lt;qty&gt; &lt;drug&gt; &lt;dosage&gt;</code>
       </p>
 
-      <label class="block text-xs text-slate-400 mb-1">Clinic</label>
-      <select id="clinicSelect" class="w-full mb-4 bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm"></select>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">Clinic</label>
+          <select id="clinicSelect" class="bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm"></select>
+        </div>
+        <div class="text-right">
+          <label class="block text-xs text-slate-400 mb-1">Channel</label>
+          <div class="inline-flex rounded-lg border border-slate-700 overflow-hidden text-sm">
+            <button id="chanSmsBtn" onclick="setChannel('sms')"
+                    class="px-3 py-1.5 bg-slate-700 text-white font-medium">📟 SMS</button>
+            <button id="chanWaBtn" onclick="setChannel('whatsapp')"
+                    class="px-3 py-1.5 bg-slate-900 text-slate-400">💬 WhatsApp</button>
+          </div>
+        </div>
+      </div>
+      <p id="channelNote" class="text-xs text-slate-500 -mt-2 mb-4">
+        Works on any phone with signal, zero mobile data required — the lowest common
+        denominator for rural clinics.
+      </p>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- SMS mode: plain inputs -->
+      <div id="smsMode" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-emerald-400 mb-1">🏥 Clinic sends</label>
           <input id="clinicText" class="w-full mono bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm"
@@ -54,6 +72,26 @@
           <label class="block text-sm font-medium text-sky-400 mb-1">🏭 Warehouse sends</label>
           <input id="warehouseText" class="w-full mono bg-slate-800 border border-slate-700 rounded px-3 py-2 text-sm"
                  placeholder="DESP 800 AMOX 250" value="DESP 800 AMOX 250" />
+          <button onclick="sendSms('warehouse')" class="mt-2 w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium rounded px-3 py-2">
+            Send as Warehouse
+          </button>
+        </div>
+      </div>
+
+      <!-- WhatsApp mode: chat-bubble look, same REC/DESP format underneath -->
+      <div id="waMode" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-[#0b141a] rounded-lg p-3 border border-slate-800">
+          <div class="text-xs text-emerald-400 font-medium mb-2">🏥 Clinic — WhatsApp</div>
+          <div class="bg-[#005c4b] text-white rounded-lg rounded-tr-none px-3 py-2 text-sm mono inline-block max-w-full"
+               contenteditable="true" id="clinicTextWa">REC 500 AMOX 250</div>
+          <button onclick="sendSms('clinic')" class="mt-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded px-3 py-2">
+            Send as Clinic
+          </button>
+        </div>
+        <div class="bg-[#0b141a] rounded-lg p-3 border border-slate-800">
+          <div class="text-xs text-sky-400 font-medium mb-2">🏭 Warehouse — WhatsApp</div>
+          <div class="bg-[#005c4b] text-white rounded-lg rounded-tr-none px-3 py-2 text-sm mono inline-block max-w-full"
+               contenteditable="true" id="warehouseTextWa">DESP 800 AMOX 250</div>
           <button onclick="sendSms('warehouse')" class="mt-2 w-full bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium rounded px-3 py-2">
             Send as Warehouse
           </button>
