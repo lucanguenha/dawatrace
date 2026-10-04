@@ -37,12 +37,21 @@ tiny command language and feed the exact same reconciliation engine.
    - Low confidence → the system explicitly **escalates to a human** instead
      of asserting a conclusion it can't support. This is deliberate: a
      wrong accusation is worse than an honest "I'm not sure."
-5. Claude (`claude-haiku-4-5`) reads the deterministic numbers and the raw
-   evidence (the actual REC/DESP messages) and writes a short, plain-language
-   explanation plus its own escalate/don't-escalate judgement, through one
-   real tool-use call — it is structurally unable to invent or override the
+5. A **provider-agnostic reasoning layer** reads the deterministic numbers and
+   the raw evidence (the actual REC/DESP messages) and writes a short,
+   plain-language explanation plus its own escalate/don't-escalate judgement.
+   It tries Claude (`claude-haiku-4-5`) first, falls back to DeepSeek
+   (`deepseek-chat`) if that provider is unavailable, and falls back again to
+   a deterministic, template-based explanation built straight from the
+   numbers if neither model answers - the demo never shows an error, and the
+   dashboard never goes quiet just because one vendor's API had a bad moment.
+   In every case, the layer is structurally unable to invent or override the
    gap or confidence numbers; it can only explain them and decide what to
-   recommend doing next.
+   recommend doing next. This also means the reasoning step is not tied to
+   one vendor, which matters directly for the brief's own framing of
+   constrained environments: the same contract could be pointed at a locally
+   hosted open-weight model with no code change beyond adding a provider
+   function.
 6. Every message, calculation, and decision is written to an append-only
    audit trail (SQLite), shown on the dashboard with the exact evidence
    behind every alert.

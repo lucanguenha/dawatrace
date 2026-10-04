@@ -92,11 +92,23 @@ def receive_sms(payload: SmsIn):
 def _reconcile_and_maybe_alert(clinic_id, drug_code):
     totals = store.totals_for(clinic_id, drug_code)
     desp_total, rec_total = totals["DESP"], totals["REC"]
-    gap, ratio = compute_gap(desp_total, rec_total)
 
     events = store.evidence_events(clinic_id, drug_code, limit=20)
     n_desp = sum(1 for e in events if e["kind"] == "DESP")
     n_rec = sum(1 for e in events if e["kind"] == "REC")
+
+    # (correcao 04/Out, demo ao vivo) Um lado sem o outro nao e um gap - e so
+    # falta de dados para cruzar. Antes disto, um REC a chegar sozinho gerava
+    # um alerta "dispatched 0" que nunca devia ter saido no ecra. Sem os dois
+    # lados nao ha reconciliacao possivel, por isso nao se cria alerta nenhum
+    # (nem "ok" nem "flagged") - so se reporta "pending" para a UI mostrar que
+    # esta a aguardar o outro lado, e so quando ambos existirem e que se
+    # calcula gap/confianca pela primeira vez.
+    if n_desp == 0 or n_rec == 0:
+        return {"status": "pending", "gap": None, "confidence": None,
+                "waiting_for": "warehouse" if n_desp == 0 else "clinic"}
+
+    gap, ratio = compute_gap(desp_total, rec_total)
 
     hours_between = None
     desp_ts = [e["ts"] for e in events if e["kind"] == "DESP"]

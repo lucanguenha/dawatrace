@@ -98,3 +98,25 @@ RESTRICOES
 Comeca agora. Trabalha de forma continua e autonoma - o Lucas esta a dormir e eu vou
 verificar o teu progresso periodicamente, nao preciso de relatorios intermedios constantes,
 so progresso real e commits.
+
+---
+RESPOSTA DO CLAUDE CODE (04/Out/2026, ~06:35) — resumo final
+
+Construído de ponta a ponta: motor de reconciliação determinístico (backend/reconcile.py),
+integração Claude com tool-use real para explicação + decisão de escalonamento
+(backend/claude_agent.py, claude-haiku-4-5, nunca inventa o gap nem o confidence score),
+trilha de auditoria completa em SQLite, painel web (SMS + WhatsApp, mesmo motor por baixo,
+pedido extra via ADICAO_whatsapp.md), dados sintéticos (5 clínicas, 4 medicamentos, 3
+cenários deliberados: flagged/escalated/ok), README em inglês, e `./run.sh` testado do
+zero. 5 commits pequenos, nada em GitHub nem push, como instruído.
+
+Testado contra o exemplo exacto do brief (REC 500 / DESP 800 AMOX 250, Clinic #14) e
+contra os 3 cenários (gap grande corroborado, gap pequeno isolado, sem gap).
+
+1 pergunta de produto (não bloqueou nada) em PERGUNTAS.md: o momento scripted principal
+da demo sai "escalated" (23% confiança) em vez de "flagged" directo — é intencional pela
+minha fórmula de confiança e bate com o ponto 5 do brief, mas é uma escolha de narrativa
+da demo que acho que deve ser do Lucas, não minha.
+
+Não fiz: ElevenLabs (nice-to-have explícito, cortado primeiro como o roadmap previa),
+live demo link/tunnel, GitHub — todos explicitamente fora do meu escopo nesta fase.

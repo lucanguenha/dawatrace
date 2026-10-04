@@ -84,3 +84,9 @@ decisao final de submeter. Aqui o trabalho passa a ser COM ele, nao por ele.
 
 ## Log de verificacoes
 - 06:03 Macau — Claude Code confirmado a trabalhar (explorou estrutura, a planear).
+- 06:1x Macau — Progresso real visto: backend com SmsIn, reconciliacao a ser verificada.
+- 06:1x Macau — Lucas sugeriu WhatsApp em vez de SMS. Decisao: SMS fica principal (bate no
+  brief oficial "offline-capable, devices people already have"), WhatsApp entra como
+  canal OPCIONAL (mesmo motor, UI diferente) — responde ao criterio oficial "capability
+  vs access trade-offs". Enviado como ADICAO_whatsapp.md, nao-bloqueante, apos Claude Code
+  ficar livre (~8min de espera, script correcto nao interrompeu trabalho em curso).

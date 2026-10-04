@@ -119,8 +119,11 @@ async function sendSms(sender) {
     }
     if (data.alert.status === "ok") {
       resultEl.innerHTML = `<span class="text-emerald-400">Received. No reconciliation gap (yet).</span>`;
+    } else if (data.alert.status === "pending") {
+      const who = data.alert.waiting_for === "warehouse" ? "the warehouse's dispatch report" : "the clinic's receipt report";
+      resultEl.innerHTML = `<span class="text-sky-400">Received. Waiting for ${who} before reconciling.</span>`;
     } else {
-      resultEl.innerHTML = `<span class="text-amber-400">Received — gap detected, see trail on the right →</span>`;
+      resultEl.innerHTML = `<span class="text-amber-400">Received. Gap detected, see trail on the right.</span>`;
     }
     await refreshAll();
   } catch (e) {
