@@ -62,6 +62,14 @@ proves a number; it explicitly does not claim to know the cause — a gap can
 be a transport delay, a reporting error, or a real loss, and conflating them
 would be both inaccurate and harmful to the people being reported on.
 
+**On language**: the explanation layer writes in Portuguese, because that is
+the working language of the clinics this is built for. That is a deliberate
+choice, not a development artefact — the system prompt and the deterministic
+fallback are each a single constant, so a deployment in another language
+means editing two strings, not rebuilding the reasoning layer. The brief asks
+for solutions designed around local languages; this is what that looks like
+when the local language is not English.
+
 ## Architecture
 
 ```
@@ -72,8 +80,9 @@ web/                  Static dashboard (HTML + vanilla JS + Tailwind via CDN)
 backend/
   app.py               FastAPI app: intake -> reconcile -> explain -> store
   reconcile.py         Deterministic parsing, gap, and confidence score
-  claude_agent.py      Single tool-use call to Claude for explanation +
-                       escalation judgement (never touches the numbers)
+  claude_agent.py      Provider-agnostic reasoning layer: Claude, then DeepSeek,
+                       then a deterministic fallback built from the same numbers
+                       (never touches the gap or the confidence score)
   store.py             SQLite persistence + the append-only audit log
   seed_data.py         Synthetic clinics/drugs/history for the demo
 
@@ -89,11 +98,13 @@ logic, which is the part being judged).
 
 ## Running it
 
-Requires Python 3.11+ and an Anthropic API key.
+Requires Python 3.11+. The reasoning layer works with an Anthropic API key,
+falls back to a DeepSeek key if one is set, and still produces a complete
+deterministic explanation if neither is — so the app runs with no keys at all.
 
 ```bash
 cp .env.example .env
-# edit .env and paste your ANTHROPIC_API_KEY
+# edit .env and paste your ANTHROPIC_API_KEY (optional: DEEPSEEK_API_KEY)
 
 ./run.sh
 ```
@@ -113,8 +124,8 @@ timestamp, never anything about a patient.
 1. Channel: SMS. Clinic: `Clinic #14 - Beira Central`.
 2. Clinic sends: `REC 500 AMOX 250`
 3. Warehouse sends: `DESP 800 AMOX 250`
-4. The reconciliation trail on the right shows a 300-unit gap, with Claude's
-   plain-language explanation and its escalation judgement, within seconds.
+4. The reconciliation trail on the right shows a 300-unit gap, with the
+   plain-language explanation and the escalation judgement, within seconds.
 
 ## What's deliberately out of scope for this demo
 
