@@ -6,3 +6,11 @@ venv/
 *.db-journal
 .env
 node_modules/
+
+# notas internas de trabalho (nao fazem parte do projecto entregue)
+.sentinel_state.json
+ADICAO_whatsapp.md
+PEDIDO_*.md
+PERGUNTAS.md
+ROADMAP_NOITE.md
+VIDEOS_GUIAO.md
