@@ -7,6 +7,25 @@ inventory staff.**
 Built for Hack-Nation 7th Global AI Hackathon — Track 04a, World Bank:
 *"Small AI for development, Track A: Health."*
 
+## Try it in 60 seconds
+
+A juror can test this directly, without watching the video.
+
+**Live demo** (synthetic data already loaded, so the trail is never empty):
+<https://projects.helpaz.net/dawatrace/>
+
+1. Channel: **SMS**. Clinic: `Clinic #14 - Beira Central`.
+2. Send as Clinic: `REC 500 AMOX 250` — the clinic reports receiving 500 units of Amoxicillin 250mg.
+3. Send as Warehouse: `DESP 800 AMOX 250` — the warehouse reports dispatching 800 units of the same drug.
+4. **Expected result, within seconds:** the reconciliation trail shows exactly one alert,
+   `dispatched 800 · received 500 · gap 300`, with the evidence line by line (both messages, who
+   sent them, when) and a deterministic confidence score. With only two corroborating messages
+   and no transport record, confidence comes out low (around 23/100), so the system **escalates to
+   a human** rather than asserting a cause. That escalation is the intended behaviour, not an
+   error — the system refuses to state a cause it cannot prove.
+5. The same flow works on the **WhatsApp** channel: identical command format, same reconciliation
+   engine underneath.
+
 ## The problem
 
 Rural clinics and the central warehouses that supply them run on paper
@@ -68,7 +87,16 @@ choice, not a development artefact — the system prompt and the deterministic
 fallback are each a single constant, so a deployment in another language
 means editing two strings, not rebuilding the reasoning layer. The brief asks
 for solutions designed around local languages; this is what that looks like
-when the local language is not English.
+when the local language is not English. Mozambique's own national languages
+(Changana, Macua) are a roadmap item, not a claim made here.
+
+**On channels, delivered and roadmap**: the two channels that work in this
+build are **SMS** (the transport is simulated, and that is declared, not
+hidden) and **WhatsApp** (the same engine, offered as an upgrade path for
+staff who already have a smartphone and data — not a dependency). Anything
+else is explicitly roadmap, not capability: an interactive **voice / IVR**
+channel is on the roadmap and is deliberately not counted today, precisely so
+that nothing in this submission overstates what the demo actually does.
 
 ## Architecture
 
@@ -118,14 +146,6 @@ including one clear flagged gap, one small ambiguous one that gets escalated
 instead of asserted, and one clean no-gap pair. **Zero real patient data is
 modelled anywhere** — this system only ever sees drug/dosage/quantity/clinic/
 timestamp, never anything about a patient.
-
-### Try the worked example from the brief
-
-1. Channel: SMS. Clinic: `Clinic #14 - Beira Central`.
-2. Clinic sends: `REC 500 AMOX 250`
-3. Warehouse sends: `DESP 800 AMOX 250`
-4. The reconciliation trail on the right shows a 300-unit gap, with the
-   plain-language explanation and the escalation judgement, within seconds.
 
 ## What's deliberately out of scope for this demo
 
